@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "../../icons";
 import RegisterPage from "../auth/RegisterPage";
@@ -17,6 +17,11 @@ function HomePage() {
   // กำหนดตัวแปร user และ role ที่ใช้ในคอมโพเนนต์
   const user = userMock;
   const userRole = user ? user.role : "guest";
+
+  const [resetForm, setResetForm] = useState(false);
+  const hdlClose = () => {
+    setResetForm(prev=>!prev)
+  };
 
   // --- ฟังก์ชันสำหรับนำทาง (Navigation Handlers) ---
   const handlePlayClick = () => {
@@ -214,20 +219,20 @@ function HomePage() {
           )}
         </div>
       </div>
-      <dialog id="register-form" className="modal">
+      <dialog id="register-form" className="modal" onClose={hdlClose}>
         <div className="modal-box">
+          <RegisterPage resetForm={resetForm}/>
           <form method="dialog">
-            <RegisterPage />
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕
             </button>
           </form>
         </div>
       </dialog>
-      <dialog id="login-form" className="modal">
+      <dialog id="login-form" className="modal" onClose={hdlClose}>
         <div className="modal-box">
+          <LoginPage resetForm={resetForm}/>
           <form method="dialog">
-            <LoginPage />
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕
             </button>
