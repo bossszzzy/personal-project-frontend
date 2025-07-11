@@ -82,7 +82,7 @@ function AppRouter() {
   }
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <RouterProvider router={finalUser} />;
+      <RouterProvider router={finalUser} />
     </Suspense>
   );
 }
