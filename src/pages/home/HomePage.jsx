@@ -3,24 +3,19 @@ import { useNavigate } from "react-router";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "../../icons";
 import RegisterPage from "../auth/RegisterPage";
 import LoginPage from "../auth/LoginPage";
+import useUserStore from "../../store/userStore";
+import { toast } from "react-toastify";
 
 function HomePage() {
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
+  const logout = useUserStore((state) => state.logout);
 
-  // *** จำลองสถานะผู้ใช้เพื่อ Mock UI ในตอนนี้ ***
-  // เปลี่ยนค่า userMock เพื่อดู UI ของแต่ละบทบาท:
-  const userMock = null; // สถานะ Guest (ยังไม่ได้ Login)
-  // const userMock = { username: "testuser", role: "user" }; // สถานะ User
-  // const userMock = { username: "gmadmin", role: "gm" }; // สถานะ GM
-  // ********************************************
-
-  // กำหนดตัวแปร user และ role ที่ใช้ในคอมโพเนนต์
-  const user = userMock;
   const userRole = user ? user.role : "guest";
 
   const [resetForm, setResetForm] = useState(false);
   const hdlClose = () => {
-    setResetForm(prev=>!prev)
+    setResetForm((prev) => !prev);
   };
 
   // --- ฟังก์ชันสำหรับนำทาง (Navigation Handlers) ---
@@ -34,12 +29,11 @@ function HomePage() {
     navigate("/history");
   };
 
-  const handleLogoutClick = () => {
-    // ผู้ใช้/GM: Logout (ในอนาคตจะเรียก logout() จาก Auth Store)
+  const handleLogoutClick = async (data) => {
     console.log("Logging out...");
-    // หลังจาก Logout, จำลองการกลับไปเป็น Guest
-    // userMock = null; // คุณต้องเปลี่ยนค่า userMock ตรงๆ ถ้าจะทดสอบแบบนี้
-    navigate("/login"); // หรือกลับไปหน้า Login
+    await logout(data);
+    toast.success("logout success")
+    navigate("/");
   };
 
   const handlePlayTestClick = () => {
@@ -77,7 +71,7 @@ function HomePage() {
 
   return (
     <>
-      <div className="min-h-screen relative text-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen w-full relative text-white flex flex-col items-center justify-center p-4">
         {/* Header */}
         <div className="absolute top-4 w-full text-xl flex justify-between items-center px-8">
           <div className="flex items-center justify-center space-x-20">
@@ -111,12 +105,29 @@ function HomePage() {
                 Register
               </button>
             ) : (
-              <button
-                onClick={handleLogoutClick}
-                className="btn btn-xl bg-[#e67e22] border-0 text-xl hover:bg-[#d35400] cursor-pointer"
-              >
-                Logout
-              </button>
+              <div className="flex items-center space-x-4">
+                {user.image ? (
+                  <img
+                    src={user.image} // ใช้ URL รูปภาพจากข้อมูลผู้ใช้
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#e67e22] shadow-md" // ปรับขนาดและสไตล์
+                  />
+                ) : (
+                  // แสดง Placeholder ถ้าไม่มีรูป (ตัวอักษรแรกของชื่อ)
+                  <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-xl font-bold text-white border-2 border-[#e67e22] shadow-md">
+                    {user.firstName ? user.firstName[0].toUpperCase() : "?"}
+                  </div>
+                )}
+                <span className="text-xl font-semibold text-white">
+                  Hello, {user.firstName}!
+                </span>
+                <button
+                  onClick={handleLogoutClick}
+                  className="btn btn-xl bg-[#e67e22] border-0 text-xl hover:bg-[#d35400] cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
             )}
           </>
         </div>
@@ -221,7 +232,7 @@ function HomePage() {
       </div>
       <dialog id="register-form" className="modal" onClose={hdlClose}>
         <div className="modal-box">
-          <RegisterPage resetForm={resetForm}/>
+          <RegisterPage resetForm={resetForm} />
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕
@@ -231,7 +242,7 @@ function HomePage() {
       </dialog>
       <dialog id="login-form" className="modal" onClose={hdlClose}>
         <div className="modal-box">
-          <LoginPage resetForm={resetForm}/>
+          <LoginPage resetForm={resetForm} />
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕

@@ -1,6 +1,6 @@
 function CategorySelectPage() {
   return (
-    <div>CategorySelectPage</div>
+    <div>aspdkgpog</div>
   )
 }
 export default CategorySelectPage

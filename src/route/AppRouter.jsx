@@ -1,6 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, use } from "react";
 
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
+import useUserStore from "../store/userStore";
 
 const HomePage = lazy(() => import("../pages/home/HomePage"));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
@@ -71,14 +72,14 @@ const gmRouter = createBrowserRouter([
 ]);
 
 function AppRouter() {
-  const user = "gm";
+  const role = useUserStore(state=>state.role)
   let finalUser;
-  if (user === "user") {
+  if (role === "user") {
     finalUser = userRouter;
-  } else if (user === "gm") {
+  } else if (role === "gm") {
     finalUser = gmRouter;
-  } else {
-    finalUser = guestRouter;
+  } else if(role === null){
+    finalUser = guestRouter
   }
   return (
     <Suspense fallback={<p>Loading...</p>}>
